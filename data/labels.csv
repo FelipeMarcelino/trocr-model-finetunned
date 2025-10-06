@@ -1,4 +1,4 @@
-image;text
+image_path;text
 image100.png;Desvio Padrão = s = sqrt(variancia).
 image101.png;Percentile: P, p porcento dos valores estão abaixo de p e (100-p) estão acima de p.
 image102.png;Percentile = Quantile ou 0.8q = 80 percentile

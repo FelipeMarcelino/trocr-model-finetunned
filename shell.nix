@@ -16,9 +16,6 @@ pkgs-unfree.mkShell {
     pythonPackages.python
     pythonPackages.venvShellHook
     pkgs-unfree.autoPatchelfHook
-    pkgs-unfree.cudaPackages.cudatoolkit
-    pkgs-unfree.cudaPackages.cudnn
-    pkgs-unfree.linuxPackages.nvidia_x11
   ];
   venvDir = "./.venv";
   postVenvCreation = ''
@@ -26,8 +23,5 @@ pkgs-unfree.mkShell {
     autoPatchelf ./.venv   '';
   postShellHook = ''
     unset SOURCE_DATE_EPOCH     
-    export LD_LIBRARY_PATH=${pkgs-unfree.cudaPackages.cudatoolkit}/lib:$LD_LIBRARY_PATH     
-    export LD_LIBRARY_PATH=${pkgs-unfree.linuxPackages.nvidia_x11}/lib:$LD_LIBRARY_PATH
-    export LD_LIBRARY_PATH=${pkgs-unfree.cudaPackages.cudnn}/lib:$LD_LIBRARY_PATH
     export LD_LIBRARY_PATH=${lib.makeLibraryPath [ stdenv.cc.cc ]}:$LD_LIBRARY_PATH '';
 }

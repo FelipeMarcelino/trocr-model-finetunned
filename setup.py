@@ -4,12 +4,14 @@ setup(
     name="trocr_handwriting",
     version="0.1.0",
     description="TrOCR training pipeline for custom handwriting recognition.",
-    author="Seu Nome",
-    packages=find_packages(where="."),
+    author="Felipe Marcelino",
+    # Diga ao setuptools para procurar pacotes dentro do diretório 'src'
+    package_dir={"": "src"},
+    packages=find_packages(where="src"),
     install_requires=[
         "torch",
         "torchvision",
-        "transformers==4.35.2",
+        "transformers",
         "datasets",
         "evaluate",
         "scikit-learn",
