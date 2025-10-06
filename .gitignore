@@ -11,3 +11,29 @@ meu-trocr-final
 trainer_output/
 .venv
 trocr-lora-finetuned/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Modelos e Checkpoints
+checkpoints/
+best_model/
+
+# Logs e execuções
+logs/
+tensorboard_runs/
+
+# Arquivos de ambiente
+.env
+.venv
+venv/
+
+# Arquivos de IDE
+.idea/
+.vscode/

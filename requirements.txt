@@ -1,0 +1,15 @@
+torch
+torchvision
+transformers==4.35.2
+datasets
+evaluate
+scikit-learn
+pandas
+peft==0.6.2
+loralib
+tensorboard
+accelerate
+jiwer
+python-Levenshtein
+Pillow
+albumentations

@@ -16,14 +16,6 @@ pkgs-unfree.mkShell {
     pythonPackages.python
     pythonPackages.venvShellHook
     pkgs-unfree.autoPatchelfHook
-    pythonPackages.datasets
-    pythonPackages.evaluate
-    pythonPackages.jiwer
-    pythonPackages.accelerate
-    pythonPackages.tensorboard
-    pythonPackages.scikit-learn
-    pythonPackages.pillow
-    pythonPackages.transformers
     pkgs-unfree.cudaPackages.cudatoolkit
     pkgs-unfree.cudaPackages.cudnn
     pkgs-unfree.linuxPackages.nvidia_x11
