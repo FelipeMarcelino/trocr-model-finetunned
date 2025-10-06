@@ -1,0 +1,13 @@
+.envrc
+*.egg-info*
+.direnv
+__pycache__/
+*.pyc
+.env
+*.log
+meu-trocr-final
+*my_py
+*.mypy_cache/
+trainer_output/
+.venv
+trocr-lora-finetuned/

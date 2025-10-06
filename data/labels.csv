@@ -1,0 +1,469 @@
+image;text
+image100.png;Desvio Padrão = s = sqrt(variancia).
+image101.png;Percentile: P, p porcento dos valores estão abaixo de p e (100-p) estão acima de p.
+image102.png;Percentile = Quantile ou 0.8q = 80 percentile
+image103.png;Percetiles = order statistics
+image104.png;Example list[T], sendo T um tipo que foi escolhidod ou limitado por bound
+image105.png;Usa se a seguinte sintaxe
+image106.png;NumberT = TypeVar('NumberT', float, decimal, Fraction), omitindo os tipos
+image107.png;del mode(data: Iterabler [NumberT]) -> NumberT
+image108.png;Copiar Código 8.19
+image109.png;8.21
+image10.png;_ Necessario de precisar fazer algo após a inif das variáveis (Validação, outros fields depedentes de fields inicializados)
+image110.png;A restrição aceita hashble e seus subtipos também.
+image111.png;HashableT = TypeVar('HashableT', bound Hashable)
+image112.png;Callable ([],int) subtype ([], float)
+image113.png;Callable [[int], None] No subtype [[float,None]]
+image114.png;_ Normalmente utilizado para função que dão raises de exception
+image115.png;Syntax: Callable[[ParamType1,ParamType2], ReturnType2]
+image116.png;Parameterized Generics and TypeVar
+image117.png;_ Com bound exemplo 8-18
+image118.png;_ São formas de Duck Typing, pois basta que a seguinte estrutura implemente uma função
+image119.png;Imperfect Typing and Strong Testing
+image11.png;Copiar Código 5.17 e explicar
+image120.png;Boxplots usa Percentiles
+image121.png;_ Percentiles são bons para sumarizar as pontas 95th, 99th
+image122.png;no Boxplot o último whisker não vai 1.5 IQR do percentil. Os circulos são outliers
+image123.png;Annotating Positional Only and Variadic Parameters
+image124.png;Bins largos largos pode esconder features importante do modelo. Se for muito pequeno e granular, fica dificíl ver o Big Picture do modelo
+image125.png;As Barras são contínuas
+image126.png;*Skewness e Kurtosis, são momentos que normalmentme não são calculadas mas sim observadas de gráficos
+image127.png;Propensão de ter valores extremos
+image128.png;Distorcido para pequenos ou grande valores.
+image129.png;Density Plots and Estimates
+image12.png;nix lock to update somente um input do flake
+image130.png;_ value_counts()
+image131.png;A escala de y é diferente
+image132.png;A área sobre a curva é 1
+image133.png;Calcule areas sobre dois pontos qualquere
+image134.png;Histogramas são plots de densidades e estimativas como linhas podem ser gerados para representar a densidade kernel density estimate
+image135.png;_ 1 ou 0, proporção de 1
+image136.png;Categorias, proporção de categorias
+image137.png;Se Usa Bar Charts, diferente de histograma onde cada x representa uma ciosa.
+image138.png;Histogram representa valores de uma variável única
+image139.png;_ Pode se usar a moda para ver os valores mais comuns
+image13.png;Ref Ramalho, 2022, 183-187
+image141.png;Explaining Binary and Categorical Data
+image142.png;_Probability: Proportion times it will occur
+image143.png;Entre -1 e 1
+image144.png;Correlation Matriz Diag is = 1
+image145.png;Use o corrplot/heatmaps
+image146.png;Valor esperado: Variável discretizada x Probabilidade
+image147.png;Spearman ou Kendalls são baseado em ranks e são robustos aos outliers. Além de lidar com algumas não-lineraridades
+image148.png;Small datasets
+image149.png;A correlação é sensível aos outliers
+image14.png;Data Classes evita que o código todo seja escrito, se você está escrevendo é um sinal de problema
+image150.png;Exploring two or More Variables
+image151.png;Scatterplots são bons para números pequenos
+image152.png;Hexagonal bining para milhões de linhas
+image153.png;Copiar fígura 1.8
+image154.png;ScatterPlot
+image155.png;Tabela de contigência
+image156.png;Separa categoria e proporção
+image157.png;tablea 1.8
+image158.png;Categórico e Númerico
+image159.png;Múltiplo Boxplots
+image15.png;Copiar código 5.18
+image160.png;Ou o lpot violino
+image161.png;Two categorical variables
+image162.png;Closures utilizam variáveis livres
+image163.png;Closures são feitos com funções aninhadas
+image164.png;Essas variaveis não são globais ou locais, mas são de funções mais externas
+image165.png;Copiar código 9.8 e 9.9
+image166.png;Ramalho, 2022, 311-314
+image167.png;O violiono mostra a distribuição também
+image168.png;=> Target = decorate(target)
+image169.png;Ramalho, 2022, 302-303
+image16.png;Inmutável, mas se precisar mudar asdict, não deve ser usado e builder diferentes deve ser implemen
+image170.png;tome nota sobre os essential facts
+image171.png;Decorator é um callable que usa outra função com argumento da função decoradad
+image172.png;@decorate
+image173.png;factorial = clock(factorial)
+image174.png;Essa função vira "clocked" (referência)
+image175.png;>>> import clockdeco_demop
+image176.png;>>> clockdeco_demo.factorial.__name__
+image177.png;Troca a função que aceita os mesmo argumentos e retorna o que o decorador deve retorna, enquanto faz processamento extra
+image178.png;def factorial(n) Return if n < 2 else n*factorial(n-1)
+image179.png;Copiar código 9.16
+image17.png;_ Serve para qualquer classe
+image181.png;Teorias com fortes assuptions cientista de dados
+image182.png;devem focar no procedimento de Sample e
+image183.png;Para suportar keyword arguments: functools.wraps(func)
+image184.png;Saber quando o dado vem de processos físicos
+image185.png;e podem ser moldados
+image186.png;Nesses casos podemos assumir algumas coisas
+image187.png;Teorícas que nos ajudam a ter insights
+image188.png;Fenomenos binomais (jogar moeda para cima,
+image189.png;fraud ou não, comprar ou não, podem ser
+image18.png;Copiar Código 5.22
+image190.png;modelados assumindos uma distribuição binomial
+image191.png;dos dados em mão
+image192.png;Random Sampling é a mehor forma de
+image193.png;Uma sample precisa ser representativa da
+image194.png;sua população mas nem sempre será possível
+image195.png;menor quantiade de dados é melhor para
+image196.png;dados que sejam bons
+image197.png;Sample: Um sub conjunto dos dados
+image198.png;Dados massivos são importantes quando eles
+image199.png;Sample mean: x, Population Mean: u
+image19.png;Data class as Intermediate Representation
+image1.png; result contém o resultado da derivação construída
+image200.png;Gerar samples estratificadas é difícil pois é
+image201.png;necessário saber quais grupos dividir
+image202.png;ticar qeu acontece durante o processo de
+image203.png;missing data e outliers são importantes
+image204.png;A maioria dos decorados muda a função
+image205.png;Decoradores são definidos em um módulo e
+image206.png;Ramalho, 2022, p308
+image207.png;medicão ou amostragem. Possui uma direção
+image208.png;nos dados ou responde sua pergunta
+image209.png;Normalmente se tem "high confidence" no selection
+image20.png;Ramalho, 2022, 190 - 196
+image210.png;Data Snooping: procurar incansvelmente
+image211.png;no dado até algo interessante apareça
+image212.png;vast search effect: diferente modelos com diferentes
+image213.png;questões em datasets largos, uma hora você vai
+image214.png;Voçe forçadamente, faz uma ação que provoca vies
+image215.png;Previne: Holdout dataset (mais de 1)
+image216.png;Regression to the Mean
+image217.png;Focar em valores extremo é uma forma de
+image218.png;achar algo interessante.
+image219.png;Serve para tipos imutáveis, pois
+image21.png;Copiar segundo código, primeiro atributo tem que ser Asia
+image220.png;Essa variável local não existe e não
+image221.png;pode ser modificada
+image222.png;keyword nonlocal
+image223.png;copiar código 9.12 e o seu erro
+image224.png;copiar código 9.13
+image225.png;copiar Variable Lookup Logic em outra
+image226.png;Ramalho, 2022, 315-317
+image227.png;Quando esse tipo muda, acba-se criando uma
+image228.png;precedência caso exista umna global e uma
+image229.png;dentro da função(toma procedência)
+image22.png;"==" compara os valores, "is" compara a referência
+image230.png;Se caso a vriável dentro da função
+image231.png;é chamada com intenção de ler a variável
+image232.png;global, é necessário: global variável
+image233.png;A variaǘel de mesmo nome pode ser alterada
+image234.png;As variáveis possuem escopo, e existe uma
+image235.png;Ramalho, 2022, 308-3011
+image236.png;Roda em tempo de import
+image237.png;Copia código 9.2 eas respostas depois do
+image238.png;Copiar também o impor abaixo
+image239.png;Ramalho, 2022, p306-307
+image23.png;_ Variáveis são labels e não caixas
+image240.png;depois copiar código página 110
+image241.png;distribution cai com probabilidade x%
+image242.png;level de confiança, quanto maior, mais largo
+image243.png;Quanto menor a sample também mais largo
+image244.png;90% engloba 90% de boostrap da sampling
+image245.png;distribution de um estatistica
+image246.png;cache, lru_cache, single dispatch
+image247.png;cache salva os resultados das chamadas
+image248.png;É um intervalo onde o sampling
+image249.png;Copiar código 9.18 -> Mostre como fica stacked
+image24.png;Compara a identidade
+image250.png;Cache é para comando rápidos pois pode
+image251.png;Todos os argumentos da função precisam
+image252.png;ser hasheáveis, pois são salvos em um
+image253.png;São ótimos para APIs remotas
+image254.png;lru_cache pode se usar o maxsize para
+image255.png;setar o tamanho da cache
+image256.png;anteriores fazendo com que o processo seja
+image257.png;taped==true f(1) e f(1.0) são guardados
+image258.png;Single Dispatch deixa que uma função
+image259.png;seja implementa diferentes comportamentos e
+image25.png;- É viáviel utilizar o "is" se comparar com Singleton, por exemplo "None"
+image260.png;a chamada é de acordo com o primeiro
+image261.png;Imita overloading de java
+image262.png;Use collections.abc e protocols para
+image263.png;Least Recently Used: As antigas não lidas
+image264.png;*Evite tipos concretos para a compatibilidade
+image265.png;- Suporte para fritura classes e classes virtuais
+image266.png;Ramalho, 202, 320-329
+image267.png;Copiar código 9.20 e 9.19
+image268.png;necessário fazer uma Fabrica de decoradores.
+image269.png;ou seja uma função que aceita argumento e
+image26.png;- tuplas são imutáveis mas seu conteúdo pode não ser. Uma lista por exemplo, dado isso, algumas tupls não são hasheáveis
+image270.png;retornar uma decorador
+image271.png;Copiar código 9.22
+image272.png; Para se usar um decorador parametrizado
+image273.png;normais de função
+image274.png;The Parameterized Clock Decoration
+image275.png;Copiar código 9.24 // falar sobre **locals
+image276.png;Ramalho, 2022, 329-335
+image277.png;Sampling Distribution: É a distribuição de
+image278.png;uma amostra estística sobre várias amstras
+image279.png;Copiar 9.23 para closures ou chamada
+image27.png;Qual usar "==" ou "is"
+image280.png;de 5 amostras é uma sample da sampling
+image281.png;Sample Statistic
+image285.png;20 amostras e média
+image286.png;Mesmo que a distribuição seja normal
+image287.png;retirada da população. Por exemplo: média
+image288.png;Desde que os dados seja grandes o suficiente
+image289.png;E a diferença da distribuição não seja tão di-
+image28.png;- listas l2=l1[:] cria uma referéncia, logo é shallow
+image290.png;Dado isso acima é possível
+image291.png;T0distribution para sampling distribution
+image292.png;intervalos de confiança
+image293.png;a distribuição das médias vai ser
+image294.png;Central limit não tem muita aplicação em DS
+image295.png;Quanto maior a amostra menor o SE
+image296.png;Não confudir standard deviation com
+image297.png;Para isso usamos Boostrap
+image298.png;Erro de variabilidade no sampling distribution
+image299.png;estatistica ou de uma modelo
+image29.png;Copiar o exemplo 6.6 e a fígura 6.3
+image2.png;- Install Phase lista de comandos strings para serem executados na instalação
+image300.png;Com substituição
+image301.png;Não precisa assumir nenhuma coisa sobre os
+image302.png;dados ou sobre os dados ser normal
+image303.png;Copiar os steps
+image304.png;Quanto mais iterações, mais confiável é
+image305.png;Bagging: Usa multipla arvores usando boost
+image306.png;Estima sampling distribution de uma
+image307.png;rows são escolhidas e calculada e uma
+image308.png;prediction média é calculada
+image309.png;Pode ser chamado de Resampling
+image30.png;Copiar a saida também no Ex 6.7
+image311.png;sem subtituição
+image312.png;strat aggregatuion. Onde umna sample de
+image313.png;yes/no
+image314.png;dbinom (x=0, size=200, p=0,02)
+image315.png;em 200 clicks, sendo a probabilidade de
+image316.png;venda igual 0.02
+image317.png;Calcula dependência entre as variáveis
+image318.png;Calcula se um conjunto de valores
+image319.png;é um "goodness-of-fit"  de uma
+image31.png;Ramalho, 2022, 206-208
+image320.png;Valor pequeno - segue a distribuição
+image321.png;Qual probabilidade de observar o vendas
+image322.png;A/B/C test
+image323.png;Similar to chi-squared, mas para varia
+image324.png;Analysis of Variance (ANOVA)
+image325.png;Mede a diferença, e o quão diferente
+image326.png;Valor alto = difere
+image327.png;Mede a diferença/variação do modelo
+image328.png;com a variacão dos dados
+image329.png;Assimétrico ou simetrico pomdem ter caudas
+image32.png;- Parametros da função passados por call by sharing -> cópia da referência, alias do paramétro original
+image330.png;A maior dos dados não é normalment dis-
+image331.png;Black Swans -> Extreme Values
+image332.png;"events per time period" => Poisson
+image333.png;Utilizado na Regressão
+image334.png;Sample Statistic
+image335.png;68% cai em um desvio padrão e
+image336.png;95% em dois desvio padrões
+image337.png;A maioria das Sampling distributions cai
+image338.png;em uma distribuição normal
+image339.png;Possui o corpo como um sino
+image33.png;- Muda os mutáveis e não muda os imutáveis
+image340.png;últimoa recurso mesmo que boostrap não
+image341.png;Também chamada de Gaussiana ou error
+image342.png;Standard normal: Quantos desvios padrão
+image343.png;compara o dado: subtrair a média e
+image344.png;divide por desvio padrão ( normalization ou
+image345.png;Standardization = z-score
+image346.png;O conjunto é z-dsitribu
+image347.png;Assumir uma distribuição normal é
+image348.png;y-axys: y-score
+image349.png;Quanto mais próximo da linha mais próximo da
+image34.png;__copy__ e __deepcopy__()
+image350.png;erros são normalmente distribuídos, assim
+image351.png;Para compara dus distribuição, basta
+image352.png;Standardize elas e compara uma dis-
+image353.png;x-axis: Quantos desvios (Quantiles)
+image354.png;Interval: Exponential distribution
+image355.png;Mudando Rate = Weibull
+image356.png;Relembra a distribuição normal mas
+image357.png;com as pontas mais grossas
+image358.png;Constant Rate: Poisson distribution
+image359.png;entre amostra de médias, parâmetros de re-
+image35.png;Copiar 6.15 com correção abaixo
+image360.png;agressão, A/B e etc
+image361.png;É um experimento de dois grupo
+image362.png;Um é o padrão (Controle)
+image363.png;Um tratamento é melhor que o grupo
+image364.png;Um sujeito vai para um dos grupos
+image365.png;Base para amostra de médias diferença
+image366.png;Escolha uma métrica (test statistic)
+image367.png;O grupo de controle é importante para
+image368.png;Saber que uma tratamento assumi um
+image369.png;Comportamento esperado, e o efeito é realmente
+image36.png;Deve guardar a pŕopria lista ou objeto mu-tável para não alterar o argumento passado
+image370.png;do tratamento e não de outra mudança
+image371.png;Deve ser escolhida antes
+image372.png;Verifica-se a diferença de efeito no trata
+image373.png;dessa forma podemos comparar ele.
+image374.png;Falar que o strategy utiliza somente uma
+image375.png;função é uma forma de implementar utili
+image376.png;zando high order Functions. Além de não
+image377.png;O código 103 se torna menor que o código 10.1
+image378.png;Normalmente classes concretas de Strategy costu
+image379.png;Primeira coisa é copiar o strategy normal
+image37.png;__del__ pode ser implementado pelo usuário
+image380.png;Contexto neste caso é order
+image381.png;Para escolher a melhor promo podemos usar o
+image382.png;@decorator para registar as promos functions
+image383.png;Classmethod recebe a classe
+image384.png;Copia código 11.3
+image385.png;Ramalho, 2022, p368 p369 - 370
+image386.png;mas lidar com dados de contexto e não possuem
+image387.png;- F-srings e str.format()
+image388.png;Date suporta strfime()
+image389.png;Copiar 11.5 e explicar mini-language (fmt-spec)
+image390.png;Copiar código 11.6 e sua resposta
+image391.png;int suporta b e x e float suporta f e %
+image392.png;Fazer classe imutável
+image393.png;Código 11.7
+image394.png;Use @property para ler os atributos privados
+image395.png;Implementar __hash__ computando has da tupla dos compoeentes
+image396.png;também chamado de teste de signi
+image397.png;Precisa implementar __has__ e __eq__
+image398.png;Interpretar eventos randomicos como
+image399.png;Diferença de A/B
+image39.png;Preserva ordem em gráficos
+image3.png;Serve para produzir builds results
+image400.png;chance randomica do sujeito
+image401.png;Uma verdade diferença entre
+image402.png;Teste de hipotese vai mais profundo
+image404.png;A hipotese nula serve para mostrar
+image405.png;Por que precisamos de teste?
+image406.png;Quando errada então A != B
+image407.png;Como fazer =>
+image408.png;Resampling: misture junto os
+image409.png;resultados de A e B e reparta
+image40.png;. Os valores possíveis para uma variável são "enforced"
+image410.png;grupos de tamanhos similares. Então
+image411.png;Observe quantas vezes se observa as
+image412.png;vezes que o valor extremo é diferente
+image413.png;A diferença deve ser extrema
+image414.png;Null = A <= B, alternative = A >= B
+image415.png;Null: B is not X% maior que
+image416.png;A: Alternative: B e % mairo que A
+image417.png;Null: menor(A)= Alternative: A != B
+image418.png;One-way: one tail hypothesis teste
+image419.png;Os valores extremos estão somente em
+image41.png;Rectangular Data
+image420.png;uma direção de p-value
+image421.png;Null Hipóteses e alternativa
+image422.png;estão dos dois lados nas duas direções
+image423.png;Atributos de classes são públicos
+image424.png;Uitlizar atributio de instância irá esconder
+image425.png;Two-way= bidirectional: Extreme Value
+image426.png;O melhor jeito: Fazer uma subclasse dando
+image427.png;Copiar código 11.9 e o código da página
+image428.png;391 explicando o __repr__
+image429.png;Não existe privado em python como em
+image42.png;Dois tipos: numéricos e categóricos
+image430.png;se utiliza dois underscore
+image431.png;Pode ser usar 1 para "protected" ou
+image432.png;o atributo de classe para sempre
+image433.png;Não se deve modificar estes atributos
+image434.png;Os valores podem ser modificados mesmo
+image435.png;Não se deve modificar estes atributos
+image436.png;Usam __slots__ faz eles serem armazena-
+image437.png;Os valors podem ser modificado mesmo
+image438.png;Subclasse deve instanciar __slot__ também
+image439.png;__weak__ dentro de __slits__ para
+image43.png;Estimates Of Location
+image440.png;Copiar 11.16
+image441.png;Usar numpy para números
+image442.png;Copiar cídog 11.13 e 11.14
+image443.png;Não é possível @cached-property
+image444.png;Implemente __match_args__ para encaixa com positional
+image445.png;Não precisa ter todos os atributios publicos. No entanto os required do __init__
+image446.png;Copiar código 11.11
+image447.png;Copiar código 11.1 como exemplo das funções
+image448.png;e o código 11.2 para a implementação
+image449.png;Boostrap: Traz confiabilidade da
+image44.png;- Estimativa: Para os estatísticos são calculada dos dados em mãos. Para DS e BA são métricas
+image450.png;_ Copiar código 11.9
+image451.png;dois ou mais grupos
+image452.png;mais que duas amostras
+image453.png;Copiar página 97
+image454.png;Diferença observada está fora da maior
+image455.png;parte da distribuição permutações, então
+image456.png;o acaso não é responsável. Caso contrário
+image457.png;Exaustiva: Faz todas as combinações
+image458.png;Permutações: Testar a hipótese com
+image459.png;Boostrap: sempre a reposição
+image45.png;O terceiro benefício pode trazer comportamento inesperados, se um valor categórico nunca foi visto elerecebe NA em R. Não é comportamento padrão do pandas.
+image460.png;Ex pág 104
+image461.png;Ex Pág 104
+image462.png;Frequência com que o modulo
+image463.png;do acaso produz resultados mais
+image464.png;Extremos que o resultado observado.
+image465.png;Boostrap: REamostragem com repo-
+image466.png;Quantas vezes a diferença x e y é maior
+image467.png;que a observada
+image468.png;p-value de 0.308 é igual 30%
+image469.png;Pode se usar uma distribuição bino-
+image46.png;_ Representar grupos de fomra equalitária dan-do pesos diferentes
+image470.png;Copiar 108
+image471.png;Erro tipo 1: Conclui erroneamente um
+image472.png;efeito real, sendo o acaso
+image473.png;Erro tipo 2: O efeito é concluido com
+image474.png;p-value: Proporção de um acontece-
+image475.png;Calcular variabilidade de um modelo
+image476.png;Excluir ou incluir features através
+image477.png;O valor p é utilizado para
+image47.png;_ Quando temos variações grande. Por exemplo um sensor com defeito pode receber um peso menor
+image49.png;_ Número do meio (Miediana), se par o ttoal de números, então a média dos do dois dos meios
+image4.png;_ Sempre inclua os Hooks especificos de cada fase
+image50.png;Média é mais sensível aos dados
+image51.png;Calcular o preço médio de casas onde um Bilionário mora, a posição do meio continua a mesma
+image52.png;Ramalho, 2022, 4-8
+image53.png;_ Pode ser utilizado Trimmed mean para evitar os outliers também
+image54.png;Practical Statistical for Data Science 50 Principles, p8-12
+image55.png;mode: frequência de números
+image56.png;A média pode ser afetada, enquanto a mediana não
+image57.png;_ Tendência forte ou fraca baseada na dispersão dos dados => Desvio padrão
+image58.png;*Dado uma medida de dispersão estat́istica, ache uma medida de tendência central, o que minimize a variação
+image59.png;Uma forma de representar uma distribuição de dados junto a variabilidade
+image5.png;_ Hooks seta variáveis, source arquivos, creat4e directory
+image60.png;Quando se usa: Quando há picos nos datasets de frequência ou muitas repetições
+image61.png;Funções Lambdas
+image62.png;_ Copiar exemplo 7.7
+image63.png;The Nine Flavors of Callable Objects
+image64.png;Copiar código 7.8
+image65.png;Quando se implementa decorators
+image66.png;Objetos de primeira classe
+image67.png;Copiar código 7.9 e 7.10
+image68.png;Código abaixo força keyword argments, evitando posicional sem nome, copiar código
+image69.png;Positional Only
+image6.png;_ Pode usar o repl para acessar a docu-mentação das funções
+image70.png;From Positional To Keyword-only Parameters
+image71.png;Callable + one argument
+image72.png;Precisa implementar __getitem__
+image73.png;Packages For Functional Programming
+image74.png;Return (a//b, a%b̂)
+image75.png;Itemgetter/ Pega o item de sequencia
+image76.png;- PEP 484
+image77.png;attrgetter Copiar 7.14
+image78.png;Use Optional com None
+image79.png;def show_count(count: int, singular: str, plural) Optional[str] = None) -> str:
+image7.png;_ É possível transformar a descrição da opção em markdown lib.mdDoc
+image80.png;:É o Type Hint, não o ==
+image81.png;Duck Typing(Defaul) mais flexível, somente objeto tem tipo. No entanto, pode acontecer erro durante aexecução. Qual operação é suportada
+image82.png;Copiar 8.4 e 8.5 com os mypy output
+image83.png;_ Nem sempre iremos conseguir colocar tipos no código python
+image84.png;Total de operações suportadas
+image85.png;object < Sequence < Multable Sequence < list ... < Any
+image86.png;_ Maps dict[str, set[str]]
+image87.png;_ Nominal: mais rígido, parametros e variáveis também tem tipos. Pode impedir que o código legítimo e certonão rode. Se importa com o source code
+image88.png;Generic Collection: copiar código 8.8
+image89.png;_ Use Sequence ou Iterable para anotar parametros mais pode usar list para retorno
+image8.png;Quando usado com rec a mudança no atri-buto não é propagada
+image90.png;Iteralbe no lugar de Sequence
+image91.png;Código 8.14
+image92.png;_ Any is magic type que permite qualquer operação e subclasses ou classes, portanto aceita qualquer coisa
+image93.png;User Dict não é aceito porque não é sub-clase mas sim um abc.Mutable Mapping mas use Mapping
+image94.png;Tuple Copiar código ex 8.11
+image95.png;_ Variação dos dados (2 dimensão), dispersão se esta clusteriado ou espalaho
+image96.png;Map dict[str, set[str]]
+image97.png;Trabalhar com squared values melhor que trabalahr com valores absolutos, especial em estatística
+image98.png;Se usar o n você subestima o valor da smaple quanta a variancia e dssvio padrão da população. Envianso aestimativa. Com n-1 se torna não en-viesada
+image99.png;media absolute deviation = Median(|x1-n|,|x2-n|...0
+image9.png;_ Overriding é para mudar o input do package
