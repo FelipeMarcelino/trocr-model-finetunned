@@ -81,8 +81,6 @@ torchvision==0.23.0
 tqdm==4.67.1
 transformers==4.57.0
 triton==3.4.0
-# Editable Git install with no remote (trocr_handwriting==0.1.0)
--e /home/felipemarcelino/Projects/trocrv2
 typing-inspection==0.4.2
 typing_extensions==4.15.0
 tzdata==2025.2
