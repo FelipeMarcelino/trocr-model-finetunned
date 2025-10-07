@@ -20,6 +20,8 @@ def initialize_model(use_peft: bool = False):
     logger.info(f"Carregando tokenizer do decoder: {DECODER_MODEL_NAME}")
     # Usamos o tokenizer do modelo de linguagem em português
     decoder_tokenizer = AutoTokenizer.from_pretrained(DECODER_MODEL_NAME)
+    decoder_tokenizer.pad_token = decoder_tokenizer.eos_token
+    decoder_tokenizer.bos_token = decoder_tokenizer.bos_token or decoder_tokenizer.eos_token
     processor.tokenizer = decoder_tokenizer
 
     model.decoder.resize_token_embeddings(len(processor.tokenizer))
