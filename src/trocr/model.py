@@ -40,6 +40,9 @@ def initialize_model(use_peft: bool = False):
     model.config.decoder_start_token_id = processor.tokenizer.bos_token_id
     model.config.pad_token_id = processor.tokenizer.pad_token_id
     model.config.eos_token_id = processor.tokenizer.eos_token_id
+    model.generation_config.pad_token_id = processor.tokenizer.pad_token_id
+    model.generation_config.eos_token_id = processor.tokenizer.eos_token_id
+    model.generation_config.decoder_start_token_id = processor.tokenizer.bos_token_id
 
     # Garante que o vocab_size no config esteja correto
     model.config.vocab_size = len(processor.tokenizer)
