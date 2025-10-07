@@ -1,41 +1,51 @@
 import logging
 
 from peft import LoraConfig, TaskType, get_peft_model
-from transformers import AutoTokenizer, TrOCRProcessor, VisionEncoderDecoderModel
+from transformers import (AutoTokenizer, TrOCRProcessor,
+                          VisionEncoderDecoderModel)
 
-from trocr.config import DECODER_MODEL_NAME, LORA_ALPHA, LORA_DROPOUT, LORA_R, PROCESSOR_MODEL_NAME
+from trocr.config import (DECODER_MODEL_NAME, LORA_ALPHA, LORA_DROPOUT, LORA_R,
+                          PROCESSOR_MODEL_NAME)
 
 logger = logging.getLogger("trocr.model")
 
 def initialize_model(use_peft: bool = False):
     """Inicializa o modelo TrOCR, o processador e, opcionalmente, aplica PEFT/LoRA.
     """
-    logger.info("Inicializando o processador TrOCR...")
+logger.info("Inicializando o processador TrOCR...")
+    # Usamos o processador do TrOCR para a parte de imagem
     processor = TrOCRProcessor.from_pretrained(PROCESSOR_MODEL_NAME)
+
+    logger.info(f"Carregando tokenizer do decoder: {DECODER_MODEL_NAME}")
+    # Carregamos nosso novo tokenizador
+    decoder_tokenizer = AutoTokenizer.from_pretrained(DECODER_MODEL_NAME)
+    
+    # --- CORREÇÃO CRÍTICA DE TOKENS ---
+    # Define os tokens especiais no tokenizador, se não existirem
+    # Usar o eos_token como pad_token é uma prática comum para modelos auto-regressivos
+    decoder_tokenizer.pad_token = decoder_tokenizer.eos_token
+    # Garantimos que os outros tokens também estejam definidos.
+    decoder_tokenizer.bos_token = decoder_tokenizer.bos_token or decoder_tokenizer.eos_token
+    # --- FIM DA CORREÇÃO ---
+
+    # Substitui o tokenizador no processador
+    processor.tokenizer = decoder_tokenizer
 
     logger.info("Inicializando o modelo VisionEncoderDecoder...")
     model = VisionEncoderDecoderModel.from_pretrained(PROCESSOR_MODEL_NAME)
 
-
-    logger.info(f"Carregando tokenizer do decoder: {DECODER_MODEL_NAME}")
-    # Usamos o tokenizer do modelo de linguagem em português
-    decoder_tokenizer = AutoTokenizer.from_pretrained(DECODER_MODEL_NAME)
-    decoder_tokenizer.pad_token = decoder_tokenizer.eos_token
-    decoder_tokenizer.bos_token = decoder_tokenizer.bos_token or decoder_tokenizer.eos_token
-    processor.tokenizer = decoder_tokenizer
-
+    # Redimensiona os embeddings do modelo para o novo tokenizador
     model.decoder.resize_token_embeddings(len(processor.tokenizer))
 
-
-    if processor.tokenizer.pad_token is None:
-        logger.warning("Tokenizer não possui pad_token. Usando eos_token como pad_token.")
-        processor.tokenizer.pad_token = processor.tokenizer.eos_token
-
-    # --- Configuração Essencial do Modelo ---
-    # Define os tokens especiais no config do modelo, que são usados pelo método .generate()
+    # --- ATUALIZAÇÃO DA CONFIGURAÇÃO DO MODELO ---
+    # Atribui os IDs corretos dos tokens à configuração do modelo
     model.config.decoder_start_token_id = processor.tokenizer.bos_token_id
     model.config.pad_token_id = processor.tokenizer.pad_token_id
-    model.config.vocab_size = model.config.decoder.vocab_size
+    model.config.eos_token_id = processor.tokenizer.eos_token_id
+    
+    # Garante que o vocab_size no config esteja correto
+    model.config.vocab_size = len(processor.tokenizer)
+    model.config.decoder.vocab_size = len(processor.tokenizer)
 
     # Configuração do feixe de busca (beam search) para geração
     model.config.eos_token_id = processor.tokenizer.eos_token_id
