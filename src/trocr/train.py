@@ -52,6 +52,7 @@ def main(args):
         logging_steps=args.logging_steps,
         eval_steps=args.eval_steps,
         save_steps=args.eval_steps,
+        max_grad_norm=1.0,
         save_total_limit=2,
         load_best_model_at_end=True,
         metric_for_best_model="wer",
