@@ -1,25 +1,23 @@
 import logging
 
 from peft import LoraConfig, TaskType, get_peft_model
-from transformers import (AutoTokenizer, TrOCRProcessor,
-                          VisionEncoderDecoderModel)
+from transformers import AutoTokenizer, TrOCRProcessor, VisionEncoderDecoderModel
 
-from trocr.config import (DECODER_MODEL_NAME, LORA_ALPHA, LORA_DROPOUT, LORA_R,
-                          PROCESSOR_MODEL_NAME)
+from trocr.config import DECODER_MODEL_NAME, LORA_ALPHA, LORA_DROPOUT, LORA_R, PROCESSOR_MODEL_NAME
 
 logger = logging.getLogger("trocr.model")
 
 def initialize_model(use_peft: bool = False):
     """Inicializa o modelo TrOCR, o processador e, opcionalmente, aplica PEFT/LoRA.
     """
-logger.info("Inicializando o processador TrOCR...")
+    logger.info("Inicializando o processador TrOCR...")
     # Usamos o processador do TrOCR para a parte de imagem
     processor = TrOCRProcessor.from_pretrained(PROCESSOR_MODEL_NAME)
 
     logger.info(f"Carregando tokenizer do decoder: {DECODER_MODEL_NAME}")
     # Carregamos nosso novo tokenizador
     decoder_tokenizer = AutoTokenizer.from_pretrained(DECODER_MODEL_NAME)
-    
+
     # --- CORREÇÃO CRÍTICA DE TOKENS ---
     # Define os tokens especiais no tokenizador, se não existirem
     # Usar o eos_token como pad_token é uma prática comum para modelos auto-regressivos
@@ -42,7 +40,7 @@ logger.info("Inicializando o processador TrOCR...")
     model.config.decoder_start_token_id = processor.tokenizer.bos_token_id
     model.config.pad_token_id = processor.tokenizer.pad_token_id
     model.config.eos_token_id = processor.tokenizer.eos_token_id
-    
+
     # Garante que o vocab_size no config esteja correto
     model.config.vocab_size = len(processor.tokenizer)
     model.config.decoder.vocab_size = len(processor.tokenizer)
