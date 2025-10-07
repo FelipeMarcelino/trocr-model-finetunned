@@ -62,7 +62,7 @@ def main(args):
         learning_rate=args.learning_rate,
         weight_decay=0.01,
         lr_scheduler_type="cosine",
-        warmup_steps=0.1,
+        warmup_ratio=0.1
     )
 
     # 6. Instanciação do Trainer
