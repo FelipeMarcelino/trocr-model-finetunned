@@ -48,7 +48,6 @@ logger.info("Inicializando o processador TrOCR...")
     model.config.decoder.vocab_size = len(processor.tokenizer)
 
     # Configuração do feixe de busca (beam search) para geração
-    model.config.eos_token_id = processor.tokenizer.eos_token_id
     model.config.max_length = 64
     model.config.early_stopping = True
     model.config.no_repeat_ngram_size = 3
