@@ -10,6 +10,47 @@ from trocr.metrics import compute_metrics
 from trocr.model import initialize_model
 
 
+def save_best_model(trainer, processor, base_model, logger, use_peft: bool):
+    """Salva o melhor modelo encontrado. Se PEFT foi usado, mescla os pesos primeiro.
+    Caso contrário, salva o modelo completo diretamente do melhor checkpoint.
+    """
+    logger.info("Iniciando processo para salvar o melhor modelo...")
+    best_checkpoint_path = trainer.state.best_model_checkpoint
+
+    if best_checkpoint_path is None:
+        logger.warning("Nenhum 'melhor' checkpoint foi salvo durante o treinamento.")
+        logger.warning("Nenhum modelo final será salvo.")
+        return
+
+    logger.info(f"O melhor checkpoint encontrado está em: {best_checkpoint_path}")
+    final_model = None
+
+    if use_peft:
+        logger.info("Modo PEFT: Carregando adaptador LoRA para mesclagem...")
+        try:
+            # Carrega os pesos do adaptador LoRA sobre o modelo base
+            peft_model = PeftModel.from_pretrained(base_model, best_checkpoint_path)
+            # Mescla os pesos para criar um modelo completo
+            final_model = peft_model.merge_and_unload()
+            logger.info("Pesos do adaptador mesclados com sucesso.")
+        except Exception as e:
+            logger.error(f"Falha ao carregar e mesclar o PeftModel: {e}", exc_info=True)
+            return
+    else:
+        logger.info("Modo Full Fine-Tuning: Carregando o modelo completo do checkpoint...")
+        try:
+            # O checkpoint já contém o modelo completo, basta carregá-lo
+            final_model = VisionEncoderDecoderModel.from_pretrained(best_checkpoint_path)
+        except Exception as e:
+            logger.error(f"Falha ao carregar o modelo do checkpoint: {e}", exc_info=True)
+            return
+
+    if final_model:
+        logger.info(f"Salvando o modelo final e o processador em: {config.BEST_MODEL_DIR}")
+        final_model.save_pretrained(config.BEST_MODEL_DIR)
+        processor.save_pretrained(config.BEST_MODEL_DIR)
+        logger.info("Melhor modelo salvo com sucesso!")
+
 def log_sample_predictions(model, processor, eval_dataset, device, logger, num_samples=3):
     """Loga exemplos de predições para debug"""
     model.eval()
@@ -89,6 +130,10 @@ def main(args):
     model, processor = initialize_model(use_peft=args.use_peft)
     model.to(device)
 
+    base_model = None
+    if args.use_peft:
+        base_model = VisionEncoderDecoderModel.from_pretrained(config.PROCESSOR_MODEL_NAME)
+
     # 4. Carregamento e preparação dos dados
     logger.info("Carregando e dividindo os dados...")
     train_df, eval_df = load_and_split_data()
@@ -143,20 +188,22 @@ def main(args):
         data_collator=default_data_collator,
         callbacks=[log_callback],  # Adiciona o callback
     )
+# 6. Treinamento com try/finally para interrupção segura
+    try:
+        logger.info(f"Iniciando treinamento {'com PEFT/LoRA' if args.use_peft else 'completo'}...")
+        logger.info("Pressione Ctrl+C para interromper e salvar o melhor resultado até o momento.")
+        logger.info("Exemplos antes do treinamento:")
+        trainer.train()
+        logger.info("Treinamento concluído normalmente.")
+    except KeyboardInterrupt:
+        logger.warning("\nTreinamento interrompido pelo usuário (Ctrl+C).")
+    finally:
+        logger.info("--- FASE DE SALVAMENTO FINAL ---")
+        # Passamos o argumento 'use_peft' para a função de salvamento
+        save_best_model(trainer, processor, base_model, logger, use_peft=args.use_peft)
 
-    logger.info("Exemplos antes do treinamento:")
-    log_sample_predictions(model, processor, eval_dataset, device, logger, num_samples=args.num_samples_log)
-
-    # 7. Treinamento
-    logger.info("Iniciando o treinamento...")
-    trainer.train()
-    logger.info("Treinamento concluído.")
-
-    # 8. Salvando o melhor modelo
-    logger.info(f"Salvando o melhor modelo em: {config.BEST_MODEL_DIR}")
-    trainer.save_model(config.BEST_MODEL_DIR)
-    processor.save_pretrained(config.BEST_MODEL_DIR)
     logger.info("Processo finalizado com sucesso!")
+
 
 
 if __name__ == "__main__":
