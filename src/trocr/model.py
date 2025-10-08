@@ -3,7 +3,7 @@ import logging
 from peft import LoraConfig, TaskType, get_peft_model
 from transformers import AutoTokenizer, TrOCRProcessor, VisionEncoderDecoderModel
 
-from trocr.config import DECODER_MODEL_NAME, LORA_ALPHA, LORA_DROPOUT, LORA_R, PROCESSOR_MODEL_NAME
+from trocr.config import DECODER_MODEL_NAME, LORA_ALPHA, LORA_DROPOUT, LORA_R, MAX_TARGET_LENGTH, PROCESSOR_MODEL_NAME
 
 logger = logging.getLogger("trocr.model")
 
@@ -51,7 +51,7 @@ def initialize_model(use_peft: bool = False):
     model.config.decoder.vocab_size = len(processor.tokenizer)
 
     # Configuração do feixe de busca (beam search) para geração
-    model.config.max_length = MAX_TARGET_LENGTH
+    model.config.max_length =  MAX_TARGET_LENGTH
     model.config.early_stopping = True
     model.config.no_repeat_ngram_size = 3
     model.config.length_penalty = 2.0

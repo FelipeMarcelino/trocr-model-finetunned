@@ -120,7 +120,6 @@ def main(args):
         gradient_accumulation_steps=2,
         lr_scheduler_type="cosine",
         warmup_ratio=0.1,
-        early_stoppig_patience=5,
         )
 
     log_callback = LogPredictionsCallback(
