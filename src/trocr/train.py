@@ -42,13 +42,14 @@ def log_sample_predictions(model, processor, eval_dataset, device, logger, num_s
 class LogPredictionsCallback(TrainerCallback):
     """Callback customizado para logar predições durante o treinamento"""
 
-    def __init__(self, processor, eval_dataset, device, logger, log_frequency=5):
+    def __init__(self, processor, eval_dataset, device, logger,num_samples=3, log_frequency=5):
         self.processor = processor
         self.eval_dataset = eval_dataset
         self.device = device
         self.logger = logger
         self.log_frequency = log_frequency
         self.eval_counter = 0
+        self.num_samples = num_samples
 
     def on_evaluate(self, args, state, control, model=None, **kwargs):
         """Chamado após cada avaliação"""
@@ -62,7 +63,7 @@ class LogPredictionsCallback(TrainerCallback):
                 eval_dataset=self.eval_dataset,
                 device=self.device,
                 logger=self.logger,
-                num_samples=3,
+                num_samples=self.num_samples,
             )
 
 
@@ -128,6 +129,7 @@ def main(args):
         device=device,
         logger=logger,
         log_frequency=args.log_pred_frequency,
+        num_samples=args.num_samples_log,
     )
 
     # 6. Instanciação do Trainer
@@ -143,7 +145,7 @@ def main(args):
     )
 
     logger.info("Exemplos antes do treinamento:")
-    log_sample_predictions(model, processor, eval_dataset, device, logger, num_samples=3)
+    log_sample_predictions(model, processor, eval_dataset, device, logger, num_samples=args.num_samples_log)
 
     # 7. Treinamento
     logger.info("Iniciando o treinamento...")
@@ -180,6 +182,11 @@ if __name__ == "__main__":
     parser.add_argument(
         "--log_pred_frequency", type=int, default=5,
         help="Frequência para logar predições de exemplo (a cada N avaliações).",
+    )
+
+    parser.add_argument(
+        "--num_samples_log", type=int, default=5,
+        help="Total de samples utilizada no log",
     )
 
     parsed_args = parser.parse_args()
