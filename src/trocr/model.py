@@ -26,14 +26,15 @@ def initialize_model(use_peft: bool = False):
     decoder_tokenizer.bos_token = decoder_tokenizer.bos_token or decoder_tokenizer.eos_token
     # --- FIM DA CORREÇÃO ---
 
+    if decoder_tokenizer.pad_token is None:
+        decoder_tokenizer.add_special_tokens({"pad_token": "[PAD]"})
+
     # Substitui o tokenizador no processador
     processor.tokenizer = decoder_tokenizer
 
     logger.info("Inicializando o modelo VisionEncoderDecoder...")
     model = VisionEncoderDecoderModel.from_pretrained(PROCESSOR_MODEL_NAME)
 
-    if decoder_tokenizer.pad_token is None:
-        decoder_tokenizer.add_special_tokens({"pad_token": "[PAD]"})
     # Redimensiona os embeddings do modelo para o novo tokenizador
     model.decoder.resize_token_embeddings(len(processor.tokenizer))
 

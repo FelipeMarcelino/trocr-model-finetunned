@@ -22,7 +22,7 @@ def log_sample_predictions(model, processor, eval_dataset, device, logger, num_s
         pixel_values = sample["pixel_values"].unsqueeze(0).to(device)
 
         with torch.no_grad():
-            generated = model.generate(pixel_values, max_length=50)
+            generated = model.generate(pixel_values=pixel_values,max_length=config.MAX_TARGET_LENGTH)
 
         pred_text = processor.batch_decode(generated, skip_special_tokens=True)[0]
 
