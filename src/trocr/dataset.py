@@ -51,7 +51,7 @@ class HandwritingDataset(Dataset):
 def load_and_split_data():
     """Carrega o CSV e divide os dados em conjuntos de treino e avaliação."""
     try:
-        df = pd.read_csv(CSV_PATH,sep=";")
+        df = pd.read_csv(CSV_PATH,sep=";",encoding="utf-8")
     except FileNotFoundError:
         raise FileNotFoundError(f"Arquivo de labels não encontrado em: {CSV_PATH}")
 

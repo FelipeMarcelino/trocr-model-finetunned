@@ -32,6 +32,8 @@ def initialize_model(use_peft: bool = False):
     logger.info("Inicializando o modelo VisionEncoderDecoder...")
     model = VisionEncoderDecoderModel.from_pretrained(PROCESSOR_MODEL_NAME)
 
+    if decoder_tokenizer.pad_token is None:
+        decoder_tokenizer.add_special_tokens({"pad_token": "[PAD]"})
     # Redimensiona os embeddings do modelo para o novo tokenizador
     model.decoder.resize_token_embeddings(len(processor.tokenizer))
 
@@ -49,7 +51,7 @@ def initialize_model(use_peft: bool = False):
     model.config.decoder.vocab_size = len(processor.tokenizer)
 
     # Configuração do feixe de busca (beam search) para geração
-    model.config.max_length = 64
+    model.config.max_length = MAX_TARGET_LENGTH
     model.config.early_stopping = True
     model.config.no_repeat_ngram_size = 3
     model.config.length_penalty = 2.0

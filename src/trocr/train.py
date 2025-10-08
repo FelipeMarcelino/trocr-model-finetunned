@@ -1,13 +1,69 @@
 import argparse
 
 import torch
-from transformers import Seq2SeqTrainer, Seq2SeqTrainingArguments, default_data_collator
+from transformers import Seq2SeqTrainer, Seq2SeqTrainingArguments, TrainerCallback, default_data_collator
 
 from trocr import config
 from trocr.dataset import HandwritingDataset, load_and_split_data
 from trocr.logger_config import setup_logger
 from trocr.metrics import compute_metrics
 from trocr.model import initialize_model
+
+
+def log_sample_predictions(model, processor, eval_dataset, device, logger, num_samples=3):
+    """Loga exemplos de predições para debug"""
+    model.eval()
+    logger.info("\n" + "="*50)
+    logger.info("EXEMPLOS DE PREDIÇÕES:")
+    logger.info("="*50)
+
+    for i in range(min(num_samples, len(eval_dataset))):
+        sample = eval_dataset[i]
+        pixel_values = sample["pixel_values"].unsqueeze(0).to(device)
+
+        with torch.no_grad():
+            generated = model.generate(pixel_values, max_length=50)
+
+        pred_text = processor.batch_decode(generated, skip_special_tokens=True)[0]
+
+        # Recupera o texto real removendo os tokens de padding (-100)
+        true_labels = [l for l in sample["labels"].tolist() if l != -100]
+        true_text = processor.tokenizer.decode(true_labels, skip_special_tokens=True)
+
+        logger.info(f"\nExemplo {i+1}:")
+        logger.info(f"  Real: '{true_text}'")
+        logger.info(f"  Pred: '{pred_text}'")
+        logger.info(f"  Match: {'✓' if pred_text.strip() == true_text.strip() else '✗'}")
+
+    logger.info("="*50 + "\n")
+    model.train()
+
+
+class LogPredictionsCallback(TrainerCallback):
+    """Callback customizado para logar predições durante o treinamento"""
+
+    def __init__(self, processor, eval_dataset, device, logger, log_frequency=5):
+        self.processor = processor
+        self.eval_dataset = eval_dataset
+        self.device = device
+        self.logger = logger
+        self.log_frequency = log_frequency
+        self.eval_counter = 0
+
+    def on_evaluate(self, args, state, control, model=None, **kwargs):
+        """Chamado após cada avaliação"""
+        self.eval_counter += 1
+
+        # Loga predições a cada N avaliações
+        if self.eval_counter % self.log_frequency == 0:
+            log_sample_predictions(
+                model=model,
+                processor=self.processor,
+                eval_dataset=self.eval_dataset,
+                device=self.device,
+                logger=self.logger,
+                num_samples=3,
+            )
 
 
 def main(args):
@@ -52,7 +108,7 @@ def main(args):
         logging_steps=args.logging_steps,
         eval_steps=args.eval_steps,
         save_steps=args.eval_steps,
-        max_grad_norm=1.0,
+        max_grad_norm=0.5,
         save_total_limit=2,
         load_best_model_at_end=True,
         metric_for_best_model="wer",
@@ -60,9 +116,19 @@ def main(args):
         report_to=["tensorboard"],
         logging_dir=config.TENSORBOARD_DIR,
         learning_rate=args.learning_rate,
-        weight_decay=0.01,
+        weight_decay=0.1,
+        gradient_accumulation_steps=2,
         lr_scheduler_type="cosine",
-        warmup_ratio=0.1
+        warmup_ratio=0.1,
+        early_stoppig_patience=5,
+        )
+
+    log_callback = LogPredictionsCallback(
+        processor=processor,
+        eval_dataset=eval_dataset,
+        device=device,
+        logger=logger,
+        log_frequency=args.log_pred_frequency,
     )
 
     # 6. Instanciação do Trainer
@@ -74,7 +140,11 @@ def main(args):
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         data_collator=default_data_collator,
+        callbacks=[log_callback],  # Adiciona o callback
     )
+
+    logger.info("Exemplos antes do treinamento:")
+    log_sample_predictions(model, processor, eval_dataset, device, logger, num_samples=3)
 
     # 7. Treinamento
     logger.info("Iniciando o treinamento...")
@@ -107,6 +177,10 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--use_peft", action="store_true", help="Ativa o treinamento com PEFT/LoRA.",
+    )
+    parser.add_argument(
+        "--log_pred_frequency", type=int, default=5,
+        help="Frequência para logar predições de exemplo (a cada N avaliações).",
     )
 
     parsed_args = parser.parse_args()
