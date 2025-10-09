@@ -1,7 +1,13 @@
 import argparse
 
 import torch
-from transformers import Seq2SeqTrainer, Seq2SeqTrainingArguments, TrainerCallback, default_data_collator
+from transformers import (
+    Seq2SeqTrainer,
+    Seq2SeqTrainingArguments,
+    TrainerCallback,
+    VisionEncoderDecoderModel,
+    default_data_collator,
+)
 
 from trocr import config
 from trocr.dataset import HandwritingDataset, load_and_split_data
@@ -132,7 +138,10 @@ def main(args):
 
     base_model = None
     if args.use_peft:
-        base_model = VisionEncoderDecoderModel.from_pretrained(config.PROCESSOR_MODEL_NAME)
+        base_model = VisionEncoderDecoderModel.from_encoder_decoder_pretrained(
+        encoder_pretrained_model_name_or_path=config.ENCODER_MODEL_NAME,
+        decoder_pretrained_model_name_or_path=config.DECODER_MODEL_NAME,
+                )
 
     # 4. Carregamento e preparação dos dados
     logger.info("Carregando e dividindo os dados...")
