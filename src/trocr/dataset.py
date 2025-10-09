@@ -36,15 +36,18 @@ class HandwritingDataset(Dataset):
         pixel_values = self.processor(image, return_tensors="pt").pixel_values
 
         # Tokeniza o texto para o formato esperado pelo decoder
-        labels = self.processor.tokenizer(
+        # ✅ Usar o tokenizer corretamente
+        encoding = self.processor.tokenizer(
             text,
             padding="max_length",
             max_length=self.max_target_length,
             truncation=True,
-        ).input_ids
+            return_tensors="pt",
+        )
 
-        # Importante: máscara para que o modelo não calcule loss nos tokens de padding
-        labels = [label if label != self.processor.tokenizer.pad_token_id else -100 for label in labels]
+        labels = encoding.input_ids.squeeze()
+        # ✅ Substituir pad_token_id por -100 (ignorado no loss)
+        labels[labels == self.processor.tokenizer.pad_token_id] = -100
 
         return {"pixel_values": pixel_values.squeeze(), "labels": torch.tensor(labels)}
 

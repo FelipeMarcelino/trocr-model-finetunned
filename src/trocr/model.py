@@ -18,6 +18,13 @@ def initialize_model(use_peft: bool = False):
     logger.info(f"Carregando DECODER de texto (tokenizer) de: {DECODER_MODEL_NAME}")
     tokenizer = AutoTokenizer.from_pretrained(DECODER_MODEL_NAME)
 
+    special_tokens = {
+        "pad_token": "<pad>",
+        "bos_token": "<s>",
+        "eos_token": "</s>",
+    }
+    num_added = tokenizer.add_special_tokens(special_tokens)
+
     # O TrOCRProcessor é um wrapper conveniente para os dois
     processor = TrOCRProcessor(image_processor=image_processor, tokenizer=tokenizer)
 
@@ -31,22 +38,28 @@ def initialize_model(use_peft: bool = False):
     # 3. Configura os tokens especiais (ESSENCIAL)
     logger.info("Configurando os tokens especiais para o novo decoder...")
     # O GPT2 não tem alguns tokens, então definimos com base no que ele tem
-    tokenizer.pad_token = tokenizer.eos_token
+    if num_added > 0:
+        model.decoder.resize_token_embeddings(len(tokenizer))
 
-    # Sincroniza a configuração do modelo com o tokenizador
+    # ✅ Configurar tokens corretamente
+    model.config.decoder_start_token_id = tokenizer.bos_token_id
     model.config.pad_token_id = tokenizer.pad_token_id
-    model.config.decoder_start_token_id = tokenizer.bos_token_id or tokenizer.eos_token_id
     model.config.eos_token_id = tokenizer.eos_token_id
     model.config.vocab_size = len(tokenizer)
-    model.config.decoder.vocab_size = len(tokenizer)
+
+    model.config.is_encoder_decoder = True
+    model.config.decoder.add_cross_attention = True
+    model.config.decoder.is_decoder = True
 
     # 4. Configura os parâmetros de geração explicitamente
-    model.generation_config = GenerationConfig.from_model_config(model.config)
-    model.generation_config.max_length = MAX_TARGET_LENGTH
-    model.generation_config.num_beams = 4
-    model.generation_config.early_stopping = True
-    model.generation_config.no_repeat_ngram_size = 3
-    model.generation_config.length_penalty = 2.0
+    model.generation_config = GenerationConfig(
+        max_length=MAX_TARGET_LENGTH,
+        num_beams=1,  # Greedy para debug
+        early_stopping=True,
+        pad_token_id=tokenizer.pad_token_id,
+        bos_token_id=tokenizer.bos_token_id,
+        eos_token_id=tokenizer.eos_token_id,
+    )
 
     if use_peft:
         logger.info("Configurando o modelo com PEFT/LoRA...")

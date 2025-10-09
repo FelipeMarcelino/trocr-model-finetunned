@@ -156,26 +156,25 @@ def main(args):
         output_dir=config.CHECKPOINT_DIR,
         predict_with_generate=True,
         eval_strategy="steps",
-        per_device_train_batch_size=args.batch_size,
-        per_device_eval_batch_size=args.batch_size,
-        fp16=torch.cuda.is_available(), # Usa mixed-precision se houver GPU
+        per_device_train_batch_size=4,  # ✅ Reduzir batch size
+        per_device_eval_batch_size=4,
+        fp16=False,  # ✅ Desabilitar para debug
         num_train_epochs=args.epochs,
         logging_steps=args.logging_steps,
         eval_steps=args.eval_steps,
         save_steps=args.eval_steps,
-        max_grad_norm=0.5,
+        max_grad_norm=1.0,  # ✅ Aumentar clipping
+        learning_rate=args.learning_rate,  # ✅ LR muito menor
+        weight_decay=0.01,   # ✅ Reduzir regularização
+        gradient_accumulation_steps=4,  # ✅ Aumentar
+        lr_scheduler_type="linear",  # ✅ Scheduler mais simples
+        warmup_steps=100,  # ✅ Warmup fixo
         save_total_limit=2,
         load_best_model_at_end=True,
         metric_for_best_model="wer",
         greater_is_better=False,
         report_to=["tensorboard"],
-        logging_dir=config.TENSORBOARD_DIR,
-        learning_rate=args.learning_rate,
-        weight_decay=0.1,
-        gradient_accumulation_steps=2,
-        lr_scheduler_type="cosine",
-        warmup_ratio=0.1,
-        )
+    )
 
     log_callback = LogPredictionsCallback(
         processor=processor,
