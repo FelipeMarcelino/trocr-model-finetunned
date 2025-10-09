@@ -1,69 +1,59 @@
 import logging
 
 from peft import LoraConfig, TaskType, get_peft_model
-from transformers import AutoTokenizer, TrOCRProcessor, VisionEncoderDecoderModel
+from transformers import AutoTokenizer, GenerationConfig, TrOCRProcessor, VisionEncoderDecoderModel, ViTImageProcessor
 
-from trocr.config import DECODER_MODEL_NAME, LORA_ALPHA, LORA_DROPOUT, LORA_R, MAX_TARGET_LENGTH, PROCESSOR_MODEL_NAME
+from trocr.config import DECODER_MODEL_NAME, ENCODER_MODEL_NAME, LORA_ALPHA, LORA_DROPOUT, LORA_R, MAX_TARGET_LENGTH
 
 logger = logging.getLogger("trocr.model")
 
 def initialize_model(use_peft: bool = False):
-    """Inicializa o modelo TrOCR, o processador e, opcionalmente, aplica PEFT/LoRA.
+    """Constrói um modelo VisionEncoderDecoder combinando um encoder de visão pré-treinado
+    com um decoder de linguagem em português, e opcionalmente aplica PEFT/LoRA.
     """
-    logger.info("Inicializando o processador TrOCR...")
-    # Usamos o processador do TrOCR para a parte de imagem
-    processor = TrOCRProcessor.from_pretrained(PROCESSOR_MODEL_NAME)
+    # 1. Carrega os componentes individuais
+    logger.info(f"Carregando ENCODER de imagem de: {ENCODER_MODEL_NAME}")
+    image_processor = ViTImageProcessor.from_pretrained(ENCODER_MODEL_NAME)
 
-    logger.info(f"Carregando tokenizer do decoder: {DECODER_MODEL_NAME}")
-    # Carregamos nosso novo tokenizador
-    decoder_tokenizer = AutoTokenizer.from_pretrained(DECODER_MODEL_NAME)
+    logger.info(f"Carregando DECODER de texto (tokenizer) de: {DECODER_MODEL_NAME}")
+    tokenizer = AutoTokenizer.from_pretrained(DECODER_MODEL_NAME)
 
-    # --- CORREÇÃO CRÍTICA DE TOKENS ---
-    # Define os tokens especiais no tokenizador, se não existirem
-    # Usar o eos_token como pad_token é uma prática comum para modelos auto-regressivos
-    decoder_tokenizer.pad_token = decoder_tokenizer.eos_token
-    # Garantimos que os outros tokens também estejam definidos.
-    decoder_tokenizer.bos_token = decoder_tokenizer.bos_token or decoder_tokenizer.eos_token
-    # --- FIM DA CORREÇÃO ---
+    # O TrOCRProcessor é um wrapper conveniente para os dois
+    processor = TrOCRProcessor(image_processor=image_processor, tokenizer=tokenizer)
 
-    if decoder_tokenizer.pad_token is None:
-        decoder_tokenizer.add_special_tokens({"pad_token": "[PAD]"})
+    # 2. Constrói o modelo a partir dos componentes pré-treinados
+    logger.info("Construindo o modelo VisionEncoderDecoder a partir do encoder e decoder...")
+    model = VisionEncoderDecoderModel.from_encoder_decoder_pretrained(
+        encoder_pretrained_model_name_or_path=ENCODER_MODEL_NAME,
+        decoder_pretrained_model_name_or_path=DECODER_MODEL_NAME,
+    )
 
-    # Substitui o tokenizador no processador
-    processor.tokenizer = decoder_tokenizer
+    # 3. Configura os tokens especiais (ESSENCIAL)
+    logger.info("Configurando os tokens especiais para o novo decoder...")
+    # O GPT2 não tem alguns tokens, então definimos com base no que ele tem
+    tokenizer.pad_token = tokenizer.eos_token
 
-    logger.info("Inicializando o modelo VisionEncoderDecoder...")
-    model = VisionEncoderDecoderModel.from_pretrained(PROCESSOR_MODEL_NAME)
+    # Sincroniza a configuração do modelo com o tokenizador
+    model.config.pad_token_id = tokenizer.pad_token_id
+    model.config.decoder_start_token_id = tokenizer.bos_token_id or tokenizer.eos_token_id
+    model.config.eos_token_id = tokenizer.eos_token_id
+    model.config.vocab_size = len(tokenizer)
+    model.config.decoder.vocab_size = len(tokenizer)
 
-    # Redimensiona os embeddings do modelo para o novo tokenizador
-    model.decoder.resize_token_embeddings(len(processor.tokenizer))
-
-    # --- ATUALIZAÇÃO DA CONFIGURAÇÃO DO MODELO ---
-    # Atribui os IDs corretos dos tokens à configuração do modelo
-    model.config.decoder_start_token_id = processor.tokenizer.bos_token_id
-    model.config.pad_token_id = processor.tokenizer.pad_token_id
-    model.config.eos_token_id = processor.tokenizer.eos_token_id
-    model.generation_config.pad_token_id = processor.tokenizer.pad_token_id
-    model.generation_config.eos_token_id = processor.tokenizer.eos_token_id
-    model.generation_config.decoder_start_token_id = processor.tokenizer.bos_token_id
-
-    # Garante que o vocab_size no config esteja correto
-    model.config.vocab_size = len(processor.tokenizer)
-    model.config.decoder.vocab_size = len(processor.tokenizer)
-
-    # Configuração do feixe de busca (beam search) para geração
-    model.config.max_length =  MAX_TARGET_LENGTH
-    model.config.early_stopping = True
-    model.config.no_repeat_ngram_size = 3
-    model.config.length_penalty = 2.0
-    model.config.num_beams = 4
+    # 4. Configura os parâmetros de geração explicitamente
+    model.generation_config = GenerationConfig.from_model_config(model.config)
+    model.generation_config.max_length = MAX_TARGET_LENGTH
+    model.generation_config.num_beams = 4
+    model.generation_config.early_stopping = True
+    model.generation_config.no_repeat_ngram_size = 3
+    model.generation_config.length_penalty = 2.0
 
     if use_peft:
         logger.info("Configurando o modelo com PEFT/LoRA...")
         lora_config = LoraConfig(
             r=LORA_R,
             lora_alpha=LORA_ALPHA,
-            target_modules=["q_proj", "v_proj"], # Módulos de atenção no encoder e decoder
+            target_modules=["q_proj", "v_proj"],
             lora_dropout=LORA_DROPOUT,
             bias="none",
             task_type=TaskType.SEQ_2_SEQ_LM,
