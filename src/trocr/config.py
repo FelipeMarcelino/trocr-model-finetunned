@@ -17,7 +17,7 @@ TENSORBOARD_DIR = OUTPUT_DIR / "tensorboard_runs"
 
 # --- Configurações do Modelo ---
 # Encoder: Modelo de visão pré-treinado da Microsoft
-ENCODER_MODEL_NAME = "google/vit-base-patch16-224"
+ENCODER_MODEL_NAME = "google/vit-large-patch16-224"
 # Decoder: Modelo de linguagem em português. O tokenizer dele será usado.
 DECODER_MODEL_NAME = "pierreguillou/gpt2-small-portuguese"
 # Processor: Usamos o de um modelo TrOCR completo para obter o processador de imagem correto
